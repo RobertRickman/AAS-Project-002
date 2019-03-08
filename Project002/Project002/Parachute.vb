@@ -65,6 +65,7 @@ Public Class Parachute
             '1) check user input
             '2) checking AI
             '3) updating object data (positions,status, etc..)
+            chara.Update()
             '4) checking triggers and conditions
 
             '5) draw graphics

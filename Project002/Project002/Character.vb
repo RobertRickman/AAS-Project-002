@@ -17,10 +17,10 @@
     Dim guyY As Decimal = (Parachute.MapY + 8) * Parachute.tileSize
 
     'Update Timer
-    Dim tmrSpeed As Integer = 10
+    'Dim tmrSpeed As Integer = 10
 
     'Start Timer
-    Dim WithEvents tmrUpdate As New System.Timers.Timer(tmrSpeed) With {.Enabled = True}
+    'Dim WithEvents tmrUpdate As New System.Timers.Timer(tmrSpeed) With {.Enabled = True}
 
     Public Property characType As Integer
         Get
@@ -131,11 +131,12 @@
     End Function
 
     Public Sub Update()
-
-    End Sub
-
-    Private Sub tmrUpdate_Tick(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles tmrUpdate.Elapsed
+        setMoveDir()
         moveChar(moveDir)
     End Sub
+
+    'Private Sub tmrUpdate_Tick(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles tmrUpdate.Elapsed
+    '    moveChar(moveDir)
+    ' End Sub
 
 End Class
