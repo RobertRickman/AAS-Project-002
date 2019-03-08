@@ -2,22 +2,6 @@
 
 Public Class Parachute
 
-    'Key detection
-    Dim keyPushed As Short = 0
-
-    Public Declare Function GetAsyncKeyState Lib "user32" (ByVal vkey As Integer) As Short
-
-    Public Function GetKeyState(ByVal key1 As Integer) As Boolean
-
-        Dim s As Short
-
-        s = GetAsyncKeyState(key1)
-
-        If s = 0 Then Return False
-        Return True
-
-    End Function
-
     'View port variables
     Public tileSize As Integer = 50
     Public HEIGHT As Integer = 800
@@ -45,21 +29,14 @@ Public Class Parachute
     Public mMapX As Integer
     Public mMapY As Integer
 
-    'Character Variables
-    Public bmpChar As Bitmap
-    Public xPos As Integer = 0
-    Public yPos As Integer = 0
-    Dim moveSpd As Integer = 5
-    Public moveDir As Short = 0
-    Public LastDir As Short = 2
-
-    'Terrain Detection Collision
-    Dim guyX As Decimal = (MapX + 5) * tileSize
-    Dim guyY As Decimal = (MapY + 8) * tileSize
-
     'Paint Brush
     Dim PaintBrush As Integer = 0
 
+    'Character 
+    Dim chara As Character
+
+    'Enemy
+    Dim gbEnemy As Enemies
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Show()
@@ -69,7 +46,14 @@ Public Class Parachute
         G = Me.CreateGraphics
         BckBuf = New Bitmap(WIDTH, HEIGHT)
         bmpTile = New Bitmap(GFX.pbGFX.Image)
-        bmpChar = New Bitmap(GFX.pbChar.Image)
+
+        'Initialize character graphic objects 
+        chara = New Character
+        chara.characType = 1
+
+        'Initialize enemy graphic objects
+        gbEnemy = New Enemies
+        gbEnemy.enemiesType = 1
 
         LoadMap()
 
@@ -85,25 +69,24 @@ Public Class Parachute
             Application.DoEvents()
 
             '1) check user input
-            setMoveDir()
-            moveChar(moveDir)
             '2) checking AI
             '3) updating object data (positions,status, etc..)
+            chara.Update()
             '4) checking triggers and conditions
 
             '5) draw graphics
             DrawGraphics()
-
             '6) playing sound effects/music
 
             'Update Tick Counter
-            ' TicCounter()
+            TicCounter()
 
         Loop
 
     End Sub
 
     Public Sub DrawGraphics()
+
         'fill backbuffer
         'draw tiles
         For x As Integer = -1 To 12
@@ -111,38 +94,36 @@ Public Class Parachute
 
                 getSrcRect(MapX + x, MapY + y, tileSize, tileSize)
 
-                drec = New Rectangle((x * tileSize) + xPos, (y * tileSize) + yPos, tileSize, tileSize)
+                drec = New Rectangle((x * tileSize) + chara.xPos, (y * tileSize) + chara.yPos, tileSize, tileSize)
 
                 G.DrawImage(bmpTile, drec, srec, GraphicsUnit.Pixel)
 
             Next
         Next
 
-
-
         'draw final layers
 
         'guys, menus, etc.
-        getChar()
-        bmpChar.MakeTransparent(Color.White)
-        G.DrawImage(bmpChar, 5 * tileSize, 8 * tileSize, srec, GraphicsUnit.Pixel)
+        chara.DrawChar()
+        gbEnemy.DrawEnemy()
 
-        'G.DrawRectangle(Pens.Purple, mouseX * tileSize, mouseY * tileSize, tileSize, tileSize)
+        'displays mouse position
+        G.DrawRectangle(Pens.Purple, mouseX * tileSize, mouseY * tileSize, tileSize, tileSize)
 
         'Display: Number of Tics, X & Y COORDS, Logical COORDS
-        'G.DrawString("Ticks: " & numTics & vbCrLf &
-        ' "TPS: " & maxTics & vbCrLf &
-        ' "Mouse x: " & mouseX & vbCrLf &
-        ' "Mouse y: " & mouseY & vbCrLf &
-        ' "Mouse MapX: " & mMapX & vbCrLf &
-        ' "Mouse MapY: " & mMapY & vbCrLf &
-        ' "", Font, Brushes.Black, 500, 0)
+        G.DrawString("Ticks: " & numTics & vbCrLf &
+         "TPS: " & maxTics & vbCrLf &
+         "Mouse x: " & mouseX & vbCrLf &
+         "Mouse y: " & mouseY & vbCrLf &
+         "Mouse MapX: " & mMapX & vbCrLf &
+         "Mouse MapY: " & mMapY & vbCrLf &
+         "", Font, Brushes.Black, 500, 0)
 
         'copy backbuffer to graphics object
         G = Graphics.FromImage(BckBuf)
 
         'draw backbuffer to screen
-        BckGrdG = CreateGraphics()
+        BckGrdG = Me.CreateGraphics()
         BckGrdG.DrawImage(BckBuf, 0, 0, WIDTH, HEIGHT)
 
         ' fix overdraw
@@ -170,77 +151,6 @@ Public Class Parachute
 
     End Sub
 
-    Public Sub getChar()
-
-        srec = New Rectangle(0, 0, tileSize, tileSize)
-
-    End Sub
-
-    Public Sub setMoveDir()
-        If GetKeyState(Keys.Left) = True Then moveDir = 1
-        If GetKeyState(Keys.Right) = True Then moveDir = 2
-
-        If GetKeyState(Keys.Left) = False And
-           GetKeyState(Keys.Right) = False Then
-
-            moveDir = 0
-
-        End If
-
-        If moveDir <> 0 Then LastDir = moveDir
-
-    End Sub
-
-    Public Sub moveChar(ByVal dir As Short)
-
-        Select Case dir
-            Case 1
-
-                If isBlocked(0) = False Then
-
-                    xPos += moveSpd
-                    guyX = (guyX - moveSpd)
-
-                    If xPos >= tileSize Then
-                        xPos = 0
-                        MapX -= 1
-                    End If
-
-                End If
-
-            Case 2
-                If isBlocked(1) = False Then
-
-                    xPos -= moveSpd
-                    guyX = (guyX + moveSpd)
-
-                    If xPos <= tileSize * -1 Then
-                        xPos = 0
-                        MapX += 1
-                    End If
-                End If
-        End Select
-
-    End Sub
-
-    'Terain Collision
-    Public Function isBlocked(ByVal dir As Short) As Boolean
-
-        Select Case dir
-            Case 0 'West
-                If Map(Math.Ceiling(guyX / tileSize) - 1, (guyY / tileSize), 1) = 1 Then
-                    Return True
-                End If
-            Case 1 'East
-                If Map(Math.Floor(guyX / tileSize) + 1, (guyY / tileSize), 1) = 1 Then
-                    Return True
-                End If
-        End Select
-
-        Return False
-
-    End Function
-
     'Loading Map
     Private Sub LoadMap()
         'Wall
@@ -259,20 +169,20 @@ Public Class Parachute
     End Sub
 
     'TPS variables
-    ' Public tSec As Integer = TimeOfDay.Second
-    'Public numTics As Integer = 0
-    'Public maxTics As Integer = 0
+    Public tSec As Integer = TimeOfDay.Second
+    Public numTics As Integer = 0
+    Public maxTics As Integer = 0
 
     'Mouse movement
-    'Private Sub Parachute_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
+    Private Sub Parachute_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
 
-    '        mouseX = Math.Floor(e.X / tileSize)
-    '       mouseY = Math.Floor(e.Y / tileSize)
+        mouseX = Math.Floor(e.X / tileSize)
+        mouseY = Math.Floor(e.Y / tileSize)
 
-    '      mMapX = MapX + mouseX
-    '     mMapY = MapY + mouseY
+        mMapX = MapX + mouseX
+        mMapY = MapY + mouseY
 
-    'End Sub
+    End Sub
 
     'Mouse Click events
     '    Private Sub Parachute_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
@@ -294,20 +204,20 @@ Public Class Parachute
     'End Sub
 
     'Tic per second 
-    'Public Sub TicCounter()
+    Public Sub TicCounter()
 
-    'If tSec = TimeOfDay.Second And isRunning = True Then
+        If tSec = TimeOfDay.Second And isRunning = True Then
 
-    '       numTics += 1
+            numTics += 1
 
-    'Else
+        Else
 
-    '       maxTics = numTics
-    '      numTics = 0
-    '     tSec = TimeOfDay.Second
+            maxTics = numTics
+            numTics = 0
+            tSec = TimeOfDay.Second
 
-    'End If
+        End If
 
-    'End Sub
+    End Sub
 
 End Class
