@@ -3,6 +3,7 @@
     'Character Variables
     Dim spriteChar As Bitmap
     Dim spriteRect As Rectangle
+    Dim spriteType As Integer
     Dim moveSpd As Integer = 5
     Dim moveDir As Short = 0
     Dim LastDir As Short = 2
@@ -21,6 +22,16 @@
     'Start Timer
     Dim WithEvents tmrUpdate As New System.Timers.Timer(tmrSpeed) With {.Enabled = True}
 
+    Public Property characType As Integer
+        Get
+            Return spriteType
+        End Get
+        Set(value As Integer)
+            spriteType = value
+            getChar()
+        End Set
+    End Property
+
     'Key detection
     Dim keyPushed As Short = 0
 
@@ -35,7 +46,7 @@
         spriteChar = GFX.pbChar.Image
         spriteChar.MakeTransparent(Color.White)
 
-        Parachute.G.DrawImage(spriteChar, xPos, yPos, spriteRect, GraphicsUnit.Pixel)
+        Parachute.G.DrawImage(spriteChar, 5 * (Parachute.tileSize), 8 * (Parachute.tileSize - 4), spriteRect, GraphicsUnit.Pixel)
     End Sub
 
     'Key Detection
@@ -118,6 +129,10 @@
         Return False
 
     End Function
+
+    Public Sub Update()
+
+    End Sub
 
     Private Sub tmrUpdate_Tick(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles tmrUpdate.Elapsed
         moveChar(moveDir)

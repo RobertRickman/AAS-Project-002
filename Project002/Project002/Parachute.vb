@@ -47,7 +47,7 @@ Public Class Parachute
 
         'Initialize character graphic objects 
         chara = New Character
-
+        chara.characType = 1
 
         LoadMap()
 
@@ -69,7 +69,6 @@ Public Class Parachute
 
             '5) draw graphics
             DrawGraphics()
-
             '6) playing sound effects/music
 
             'Update Tick Counter
