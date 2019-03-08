@@ -35,6 +35,8 @@ Public Class Parachute
     'Character 
     Dim chara As Character
 
+    'Enemy
+    Dim gbEnemy As Enemies
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Show()
@@ -48,6 +50,10 @@ Public Class Parachute
         'Initialize character graphic objects 
         chara = New Character
         chara.characType = 1
+
+        'Initialize enemy graphic objects
+        gbEnemy = New Enemies
+        gbEnemy.enemiesType = 1
 
         LoadMap()
 
@@ -73,7 +79,7 @@ Public Class Parachute
             '6) playing sound effects/music
 
             'Update Tick Counter
-            ' TicCounter()
+            TicCounter()
 
         Loop
 
@@ -99,18 +105,19 @@ Public Class Parachute
 
         'guys, menus, etc.
         chara.DrawChar()
+        gbEnemy.DrawEnemy()
 
         'displays mouse position
         G.DrawRectangle(Pens.Purple, mouseX * tileSize, mouseY * tileSize, tileSize, tileSize)
 
         'Display: Number of Tics, X & Y COORDS, Logical COORDS
-        'G.DrawString("Ticks: " & numTics & vbCrLf &
-        ' "TPS: " & maxTics & vbCrLf &
-        ' "Mouse x: " & mouseX & vbCrLf &
-        ' "Mouse y: " & mouseY & vbCrLf &
-        ' "Mouse MapX: " & mMapX & vbCrLf &
-        ' "Mouse MapY: " & mMapY & vbCrLf &
-        ' "", Font, Brushes.Black, 500, 0)
+        G.DrawString("Ticks: " & numTics & vbCrLf &
+         "TPS: " & maxTics & vbCrLf &
+         "Mouse x: " & mouseX & vbCrLf &
+         "Mouse y: " & mouseY & vbCrLf &
+         "Mouse MapX: " & mMapX & vbCrLf &
+         "Mouse MapY: " & mMapY & vbCrLf &
+         "", Font, Brushes.Black, 500, 0)
 
         'copy backbuffer to graphics object
         G = Graphics.FromImage(BckBuf)
@@ -162,20 +169,20 @@ Public Class Parachute
     End Sub
 
     'TPS variables
-    ' Public tSec As Integer = TimeOfDay.Second
-    'Public numTics As Integer = 0
-    'Public maxTics As Integer = 0
+    Public tSec As Integer = TimeOfDay.Second
+    Public numTics As Integer = 0
+    Public maxTics As Integer = 0
 
     'Mouse movement
-    'Private Sub Parachute_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
+    Private Sub Parachute_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
 
-    '        mouseX = Math.Floor(e.X / tileSize)
-    '       mouseY = Math.Floor(e.Y / tileSize)
+        mouseX = Math.Floor(e.X / tileSize)
+        mouseY = Math.Floor(e.Y / tileSize)
 
-    '      mMapX = MapX + mouseX
-    '     mMapY = MapY + mouseY
+        mMapX = MapX + mouseX
+        mMapY = MapY + mouseY
 
-    'End Sub
+    End Sub
 
     'Mouse Click events
     '    Private Sub Parachute_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
@@ -197,20 +204,20 @@ Public Class Parachute
     'End Sub
 
     'Tic per second 
-    'Public Sub TicCounter()
+    Public Sub TicCounter()
 
-    'If tSec = TimeOfDay.Second And isRunning = True Then
+        If tSec = TimeOfDay.Second And isRunning = True Then
 
-    '       numTics += 1
+            numTics += 1
 
-    'Else
+        Else
 
-    '       maxTics = numTics
-    '      numTics = 0
-    '     tSec = TimeOfDay.Second
+            maxTics = numTics
+            numTics = 0
+            tSec = TimeOfDay.Second
 
-    'End If
+        End If
 
-    'End Sub
+    End Sub
 
 End Class
