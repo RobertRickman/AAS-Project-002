@@ -73,16 +73,11 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Character.vb" />
-    <Compile Include="DrawingGraphics.vb" />
-    <Compile Include="GameLoop.vb" />
-    <Compile Include="GetSrcMapTile.vb" />
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="TicCount.vb" />
     <Compile Include="Parachute.vb">
       <SubType>Form</SubType>
     </Compile>
