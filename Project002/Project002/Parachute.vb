@@ -127,7 +127,7 @@ Public Class Parachute
         bmpChar.MakeTransparent(Color.White)
         G.DrawImage(bmpChar, 5 * tileSize, 8 * tileSize, srec, GraphicsUnit.Pixel)
 
-        G.DrawRectangle(Pens.Purple, mouseX * tileSize, mouseY * tileSize, tileSize, tileSize)
+        'G.DrawRectangle(Pens.Purple, mouseX * tileSize, mouseY * tileSize, tileSize, tileSize)
 
         'Display: Number of Tics, X & Y COORDS, Logical COORDS
         'G.DrawString("Ticks: " & numTics & vbCrLf &
@@ -177,11 +177,11 @@ Public Class Parachute
     End Sub
 
     Public Sub setMoveDir()
-        If GetKeyState(Keys.A) = True Then moveDir = 1
-        If GetKeyState(Keys.D) = True Then moveDir = 2
+        If GetKeyState(Keys.Left) = True Then moveDir = 1
+        If GetKeyState(Keys.Right) = True Then moveDir = 2
 
-        If GetKeyState(Keys.A) = False And
-           GetKeyState(Keys.D) = False Then
+        If GetKeyState(Keys.Left) = False And
+           GetKeyState(Keys.Right) = False Then
 
             moveDir = 0
 
