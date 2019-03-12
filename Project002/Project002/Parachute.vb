@@ -33,7 +33,7 @@ Public Class Parachute
     Dim PaintBrush As Integer = 0
 
     'Character 
-    Dim chara As Character
+    Public chara As Character
 
     'Enemy
     Dim gbEnemy As Enemies
@@ -62,9 +62,9 @@ Public Class Parachute
     End Sub
 
     Public Sub StartGameLoop()
-
+        MsgBox(gbEnemy.enemyX)
         Do While isRunning = True
-
+            MsgBox(gbEnemy.targetX)
             'Keep application responsive
             Application.DoEvents()
 

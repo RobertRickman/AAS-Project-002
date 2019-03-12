@@ -56,7 +56,7 @@ Partial Class GFX
         Me.Controls.Add(Me.pbChar)
         Me.Controls.Add(Me.pbGFX)
         Me.Name = "GFX"
-        Me.Text = "GFX"
+        Me.Text = " "
         CType(Me.pbChar, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.pbGFX, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)

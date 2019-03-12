@@ -4,23 +4,13 @@
     Dim spriteChar As Bitmap
     Dim spriteRect As Rectangle
     Dim spriteType As Integer
-    Dim moveSpd As Integer = 5
-    Dim moveDir As Short = 0
+    Dim moveSpd As Integer = 1
+    Public moveDir As Short = 0
     Dim LastDir As Short = 2
 
     'Character Position Variables
     Public xPos As Integer = 0
     Public yPos As Integer = 0
-
-    'Terrain Detection Collision
-    Dim guyX As Decimal = (Parachute.MapX + 5) * Parachute.tileSize
-    Dim guyY As Decimal = (Parachute.MapY + 8) * Parachute.tileSize
-
-    'Update Timer
-    'Dim tmrSpeed As Integer = 10
-
-    'Start Timer
-    'Dim WithEvents tmrUpdate As New System.Timers.Timer(tmrSpeed) With {.Enabled = True}
 
     Public Property characType As Integer
         Get
@@ -134,9 +124,5 @@
         setMoveDir()
         moveChar(moveDir)
     End Sub
-
-    'Private Sub tmrUpdate_Tick(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles tmrUpdate.Elapsed
-    '    moveChar(moveDir)
-    ' End Sub
 
 End Class

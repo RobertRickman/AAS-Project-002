@@ -5,8 +5,10 @@
     Dim spriteType As Integer = 0
 
     'Critter Position
-    Public enemyX As Integer = 0
+    Public enemyX As Integer = 50
     Public enemyY As Integer = 0
+
+    Public targetX As Integer = (Parachute.MapX) * Parachute.tileSize
 
     'Update Timer
     Dim tmrSpeed As Integer = 10
@@ -40,16 +42,29 @@
     End Sub
 
     Public Sub moveEnemy()
-        enemyY += moveSpd
+
+        If enemyY <> 350 Then
+            enemyY += moveSpd
+        End If
+
+        If targetX <> 1250 Then
+            If guyX < 1250 Then
+                enemyX += moveSpd
+            ElseIf guyX > 1250 Then
+                enemyX -= moveSpd
+            End If
+        End If
     End Sub
 
     Public Sub Update()
         'update enemy AI 
+
+        moveEnemy()
+        targetX = Parachute.Map(Math.Ceiling(guyX / Parachute.tileSize) - 1, (guyY / Parachute.tileSize), 1)
     End Sub
 
 
     Private Sub tmrUpdate_Tick(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles tmrUpdate.Elapsed
-        moveEnemy()
-
+        Update()
     End Sub
 End Class
