@@ -29,6 +29,14 @@ Public Class Parachute
     Public mMapX As Integer
     Public mMapY As Integer
 
+    'Add bullet
+    ' Private src As BitmapImage
+    Private imgBullet As Image
+
+    'Bullet related
+    Private bulletSpeed As Integer    Private isFireReady As Boolean    Private bulletTimer As DispatcherTimer    Private newBulletPosition As Double    Private offsetBullet As Double    Private bullet As Image
+
+
     'Paint Brush
     Dim PaintBrush As Integer = 0
 
@@ -37,6 +45,17 @@ Public Class Parachute
 
     'Enemy
     Dim gbEnemy As Enemies
+    ' Sub New()
+
+    'Set image bmp
+    'src = New BitmapImage()
+    'src.BeginInit()
+    'src.UriSource = New Uri("images/bullet.png", UriKind.RelativeOrAbsolute)
+    ''src.CacheOption = BitmapCacheOption.OnLoad
+    'src.EndInit()
+
+
+    'End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Show()
@@ -219,5 +238,56 @@ Public Class Parachute
         End If
 
     End Sub
+
+    'Case Keys.Space
+    'If isFireReady Then
+    '                ' makeBullet(imgShip, bullet)
+    '                ' FireBullet()
+    '                isFireReady = False
+    '            End If
+
+    'Case Else
+
+    'robert added this 
+    'Private Sub makeBullet(startObject As Image, laser As Image)
+    '    bullet.Source = src
+    '    bullet.Stretch = Stretch.Uniform
+
+    '    bullet.Width = 40
+    '    bullet.Height = 40
+
+    '    Canvas.SetLeft(bullet, Canvas.GetLeft(startObject) + ((startObject.Width / 2) - offsetBullet))
+    '    Canvas.SetTop(bullet, Canvas.GetTop(startObject))
+
+    '    mainCanvas.Children.Add(bullet)
+    'End Sub
+
+    'Private Sub FireBullet()
+
+    '    bulletTimer = New DispatcherTimer()
+    '    AddHandler bulletTimer.Tick, AddressOf BulletTimer_Tick
+    '    ' bulletTimer.Interval = TimeSpan.FromMilliseconds(speed)
+
+    '    'bulletTimer.Start()
+
+    'End Sub
+    'Private Sub BulletTimer_Tick(sender As Object, e As EventArgs)
+    '    newBulletPosition = (Canvas.GetTop(bullet) - bulletSpeed)
+    '    Canvas.SetTop(bullet, newBulletPosition)
+
+    '    If newBulletPosition < (0 - imgShip.Height) Then
+    '        Console.WriteLine("done")
+    '        bulletTimer.Stop()
+
+
+    'mainCanvas.Children.Remove(bullet)
+    '        isFireReady = True
+    '    Else
+
+    '        Console.WriteLine("running")
+    '    End If
+
+    'End Sub
+
 
 End Class
