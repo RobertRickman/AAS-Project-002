@@ -23,12 +23,6 @@ Public Class Parachute
     'Track if game is running 
     Public isRunning As Boolean = True
 
-    'Mouse locations/movement
-    Public mouseX As Integer
-    Public mouseY As Integer
-    Public mMapX As Integer
-    Public mMapY As Integer
-
     'New System
     Dim moveRight As Boolean
     Dim moveLeft As Boolean
@@ -39,31 +33,33 @@ Public Class Parachute
     Dim missleNum As Integer = 0
     Dim missleOnScrn(10) As Boolean
 
-    Dim maxEnemyNum = 5
-    Dim enemyAry(maxEnemyNum) As PictureBox
-    Dim enemyOnScrn(maxEnemyNum) As Boolean
+    Dim maxEnemyNum = 2
+    Public enemyAry(maxEnemyNum) As PictureBox
+    Public enemyOnScrn(maxEnemyNum) As Boolean
+    Dim enemySpd As Integer = 20
+
     Dim scre As Integer
-    Dim enemySpd As Integer = 5
 
     Dim snd As New Media.SoundPlayer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'PlayBackgroundSoundFile()
+
         Me.Show()
         Me.Focus()
-
-        PlayBackgroundSoundFile()
 
         Me.Controls.Add(GFX.Canon)
         GFX.Canon.Top = 380
         GFX.Canon.Left = 250
         createMissles(maxMissleNum)
-        createEnemies(maxEnemyNum)
+
+        Enemies.createEnemies(maxEnemyNum)
+
         Randomize()
         'Starting Timers
         Timer.Start()
         enemyTimer.Start()
         scoreTimer.Start()
-
 
         'Initialize graphic objects before setting values
         G = Me.CreateGraphics
@@ -103,6 +99,7 @@ Public Class Parachute
                 If Collision(missleAry(i), enemyAry(j)) Then
                     enemyAry(j).Top = 0
                     enemyAry(j).Left = CInt(Rnd() * Me.WIDTH)
+                    missleAry(i).Visible = False
                     snd.SoundLocation = "oof.wav"
                     snd.Play()
                 End If
@@ -112,7 +109,6 @@ Public Class Parachute
 
     End Sub
 
-    'enemy movement
     Private Sub enemyTimer_Tick(sender As Object, e As EventArgs) Handles enemyTimer.Tick
         Dim i As Integer
         Dim rand As Double
@@ -124,7 +120,9 @@ Public Class Parachute
             If enemyAry(i).Top > Me.HEIGHT Then
                 Timer.Stop()
                 enemyTimer.Stop()
+                scoreTimer.Stop()
                 MsgBox("Game Over BITCH!!")
+                Application.Exit()
             End If
 
             rand = Rnd()
@@ -149,7 +147,7 @@ Public Class Parachute
         Score.Text = "Score: " & scre
 
         If scre Mod 10 = 0 Then
-            enemySpd += 0.5
+            enemySpd += 5
         End If
     End Sub
 
@@ -190,27 +188,6 @@ Public Class Parachute
 
         Next
 
-    End Sub
-
-    Private Sub createEnemies(ByVal num As Integer)
-
-        For i = 0 To num
-            Dim enemy As New PictureBox
-            enemy.Image = Image.FromFile("C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\Goblinp50.png")
-
-            Me.Controls.Add(enemy)
-            enemy.Width = 50
-            enemy.Height = 50
-            enemy.BorderStyle = BorderStyle.FixedSingle
-            enemy.BackColor = Color.Red
-            enemy.Top = 50
-            enemy.Left = i * 90
-            enemy.BringToFront()
-            enemyAry(i) = enemy
-            enemyAry(i).Visible = True
-            enemyOnScrn(i) = True
-
-        Next
     End Sub
 
     Private Sub Parachute_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -289,7 +266,12 @@ Public Class Parachute
 
         G = Graphics.FromImage(BckBuf)
 
-        BckGrdG = Me.CreateGraphics()
+        Try
+            BckGrdG = Me.CreateGraphics()
+        Catch ex As Exception
+           
+        End Try
+
         BckGrdG.DrawImage(BckBuf, 0, 0, WIDTH, HEIGHT)
 
         G.Clear(Color.Wheat)
@@ -332,84 +314,5 @@ Public Class Parachute
         Map(29, 28, 0) = 3
 
     End Sub
-
-
-
-
-    'Sub New()
-
-    'Set image bmp
-    'src = New BitmapImage()
-    'src.BeginInit()
-    'src.UriSource = New Uri("images/bullet.png", UriKind.RelativeOrAbsolute)
-    ''src.CacheOption = BitmapCacheOption.OnLoad
-    'src.EndInit()
-
-    'End Sub
-
-    'Add bullet
-    ' Private src As BitmapImage
-    'Private imgBullet As Image
-
-    'Bullet related
-    'Private bulletSpeed As Integer
-    'Private isFireReady As Boolean
-    'Private bulletTimer As DispatcherTimer
-    'Private newBulletPosition As Double
-    'Private offsetBullet As Double
-    'Private bullet As Image
-
-    'Case Keys.Space
-    'If isFireReady Then
-    '                ' makeBullet(imgShip, bullet)
-    '                ' FireBullet()
-    '                isFireReady = False
-    '            End If
-
-    'Case Else
-
-    'robert added this 
-    'Private Sub makeBullet(startObject As Image, laser As Image)
-    '    bullet.Source = src
-    '    bullet.Stretch = Stretch.Uniform
-
-    '    bullet.Width = 40
-    '    bullet.Height = 40
-
-    '    Canvas.SetLeft(bullet, Canvas.GetLeft(startObject) + ((startObject.Width / 2) - offsetBullet))
-    '    Canvas.SetTop(bullet, Canvas.GetTop(startObject))
-
-    '    mainCanvas.Children.Add(bullet)
-    'End Sub
-
-    'Private Sub FireBullet()
-
-    '    bulletTimer = New DispatcherTimer()
-    '    AddHandler bulletTimer.Tick, AddressOf BulletTimer_Tick
-    '    ' bulletTimer.Interval = TimeSpan.FromMilliseconds(speed)
-
-    '    'bulletTimer.Start()
-
-    'End Sub
-
-    'Private Sub BulletTimer_Tick(sender As Object, e As EventArgs)
-    '    newBulletPosition = (Canvas.GetTop(bullet) - bulletSpeed)
-    '    Canvas.SetTop(bullet, newBulletPosition)
-
-    '    If newBulletPosition < (0 - imgShip.Height) Then
-    '        Console.WriteLine("done")
-    '        bulletTimer.Stop()
-
-
-    'mainCanvas.Children.Remove(bullet)
-    '        isFireReady = True
-    '    Else
-
-    '        Console.WriteLine("running")
-    '    End If
-
-    'End Sub
-
-
 
 End Class

@@ -1,70 +1,22 @@
 ﻿Public Class Enemies
-    Dim spriteRect As Rectangle
-    Dim spriteBmp As Bitmap
-    Dim moveSpd As Integer = 1
-    Dim spriteType As Integer = 0
 
-    'Critter Position
-    Public enemyX As Integer = 50
-    Public enemyY As Integer = 0
+    Public Shared Sub createEnemies(ByVal num As Integer)
 
-    Public targetX As Integer = (Parachute.MapX) * Parachute.tileSize
+        For i = 0 To num
+            Dim enemy As New PictureBox
+            enemy.Image = Image.FromFile("C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\Goblinp50.png")
 
-    'Update Timer
-    Dim tmrSpeed As Integer = 10
+            Parachute.Controls.Add(enemy)
+            enemy.Width = 50
+            enemy.Height = 50
+            enemy.BackColor = Color.Red
+            enemy.Top = 50
+            enemy.Left = i * 90
+            enemy.BringToFront()
+            Parachute.enemyAry(i) = enemy
+            Parachute.enemyAry(i).Visible = True
+            Parachute.enemyOnScrn(i) = True
 
-    'start timer when class is called
-    Dim WithEvents tmrUpdate As New System.Timers.Timer(tmrSpeed) With {.Enabled = True}
-
-    Public Property enemiesType As Integer
-        Get
-            Return spriteType
-        End Get
-        Set(value As Integer)
-            spriteType = value
-            spriteSrc()
-        End Set
-    End Property
-
-    Public Sub spriteSrc()
-
-        spriteRect = New Rectangle(50, 0, 50, 50)
-
-    End Sub
-
-    Public Sub DrawEnemy()
-
-        spriteBmp = GFX.pbChar.Image
-        spriteBmp.MakeTransparent(Color.White)
-
-        Parachute.G.DrawImage(spriteBmp, enemyX, enemyY, spriteRect, GraphicsUnit.Pixel)
-
-    End Sub
-
-    Public Sub moveEnemy()
-
-        If enemyY <> 350 Then
-            enemyY += moveSpd
-        End If
-
-        If targetX <> 1250 Then
-            If guyX < 1250 Then
-                enemyX += moveSpd
-            ElseIf guyX > 1250 Then
-                enemyX -= moveSpd
-            End If
-        End If
-    End Sub
-
-    Public Sub Update()
-        'update enemy AI 
-
-        moveEnemy()
-        targetX = Parachute.Map(Math.Ceiling(guyX / Parachute.tileSize) - 1, (guyY / Parachute.tileSize), 1)
-    End Sub
-
-
-    Private Sub tmrUpdate_Tick(ByVal sender As Object, ByVal e As System.Timers.ElapsedEventArgs) Handles tmrUpdate.Elapsed
-        Update()
+        Next
     End Sub
 End Class
