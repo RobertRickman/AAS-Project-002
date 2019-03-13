@@ -36,7 +36,7 @@ Partial Class GFX
         '
         'goblin
         '
-        Me.goblin.BackColor = System.Drawing.Color.Transparent
+        Me.goblin.BackColor = System.Drawing.SystemColors.Control
         Me.goblin.Image = Global.Project002.My.Resources.Resources.Goblinp50
         Me.goblin.Location = New System.Drawing.Point(12, 269)
         Me.goblin.Name = "goblin"
@@ -56,6 +56,7 @@ Partial Class GFX
         '
         'Canon
         '
+        Me.Canon.BackColor = System.Drawing.SystemColors.Control
         Me.Canon.Image = Global.Project002.My.Resources.Resources.Canonp50
         Me.Canon.Location = New System.Drawing.Point(12, 179)
         Me.Canon.Name = "Canon"

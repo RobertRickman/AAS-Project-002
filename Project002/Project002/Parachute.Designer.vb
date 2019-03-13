@@ -24,17 +24,40 @@ Partial Class Parachute
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Me.Timer = New System.Windows.Forms.Timer(Me.components)
+        Me.enemyTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.Score = New System.Windows.Forms.Label()
+        Me.scoreTimer = New System.Windows.Forms.Timer(Me.components)
         Me.SuspendLayout()
         '
         'Timer
         '
         Me.Timer.Interval = 20
         '
+        'enemyTimer
+        '
+        Me.enemyTimer.Interval = 200
+        '
+        'Score
+        '
+        Me.Score.AutoSize = True
+        Me.Score.BackColor = System.Drawing.Color.LimeGreen
+        Me.Score.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Score.Location = New System.Drawing.Point(391, 9)
+        Me.Score.Name = "Score"
+        Me.Score.Size = New System.Drawing.Size(61, 20)
+        Me.Score.TabIndex = 0
+        Me.Score.Text = "Score:"
+        '
+        'scoreTimer
+        '
+        Me.scoreTimer.Interval = 1000
+        '
         'Parachute
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(499, 500)
+        Me.Controls.Add(Me.Score)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.MaximizeBox = False
         Me.MaximumSize = New System.Drawing.Size(515, 539)
@@ -42,9 +65,14 @@ Partial Class Parachute
         Me.MinimumSize = New System.Drawing.Size(515, 539)
         Me.Name = "Parachute"
         Me.Text = "Parachute"
+        Me.TransparencyKey = System.Drawing.Color.Transparent
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
     Friend WithEvents Timer As Timer
+    Friend WithEvents enemyTimer As Timer
+    Friend WithEvents Score As Label
+    Friend WithEvents scoreTimer As Timer
 End Class

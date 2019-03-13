@@ -4,8 +4,8 @@ Public Class Parachute
 
     'View port variables
     Public tileSize As Integer = 50
-    Public HEIGHT As Integer = 800
-    Public WIDTH As Integer = 800
+    Public HEIGHT As Integer = 539
+    Public WIDTH As Integer = 515
 
     'Map variables
     Public Map(100, 100, 10) As Integer
@@ -42,48 +42,49 @@ Public Class Parachute
     Dim maxEnemyNum = 5
     Dim enemyAry(maxEnemyNum) As PictureBox
     Dim enemyOnScrn(maxEnemyNum) As Boolean
+    Dim scre As Integer
+    Dim enemySpd As Integer = 5
 
-    'Enemy
-    Dim gbEnemy As Enemies
+    Dim snd As New Media.SoundPlayer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Show()
         Me.Focus()
 
-        SetStyle(ControlStyles.SupportsTransparentBackColor, True)
-        
-        'Adding Character graphics
+        PlayBackgroundSoundFile()
+
         Me.Controls.Add(GFX.Canon)
         GFX.Canon.Top = 380
         GFX.Canon.Left = 250
-
         createMissles(maxMissleNum)
         createEnemies(maxEnemyNum)
+        Randomize()
+        'Starting Timers
         Timer.Start()
+        enemyTimer.Start()
+        scoreTimer.Start()
+
 
         'Initialize graphic objects before setting values
         G = Me.CreateGraphics
         BckBuf = New Bitmap(WIDTH, HEIGHT)
         bmpTile = New Bitmap(GFX.pbGFX.Image)
 
-        'Initialize enemy graphic objects
-        gbEnemy = New Enemies
-        gbEnemy.enemiesType = 1
-
         LoadMap()
-
-        StartGameLoop()
+        'Continue to draw background graphics
+        gameLoop()
 
     End Sub
 
+    'character and missle movement
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
         Dim i As Integer
         Dim j As Integer
 
-        If moveRight = True Then
+        If moveRight = True And (GFX.Canon.Left < Me.WIDTH - 40) Then
             GFX.Canon.Left += moveSpd
         End If
-        If moveLeft = True Then
+        If moveLeft = True And (GFX.Canon.Left > -10) Then
             GFX.Canon.Left -= moveSpd
         End If
 
@@ -97,10 +98,13 @@ Public Class Parachute
 
             End If
 
+            'check for collision between enemies and missles
             For j = 0 To maxEnemyNum
                 If Collision(missleAry(i), enemyAry(j)) Then
-                    missleAry(i).Visible = False
-                    enemyAry(j).Visible = False
+                    enemyAry(j).Top = 0
+                    enemyAry(j).Left = CInt(Rnd() * Me.WIDTH)
+                    snd.SoundLocation = "oof.wav"
+                    snd.Play()
                 End If
             Next
 
@@ -108,8 +112,51 @@ Public Class Parachute
 
     End Sub
 
+    'enemy movement
+    Private Sub enemyTimer_Tick(sender As Object, e As EventArgs) Handles enemyTimer.Tick
+        Dim i As Integer
+        Dim rand As Double
+
+        For i = 0 To maxEnemyNum
+
+            enemyAry(i).Top += enemySpd
+
+            If enemyAry(i).Top > Me.HEIGHT Then
+                Timer.Stop()
+                enemyTimer.Stop()
+                MsgBox("Game Over BITCH!!")
+            End If
+
+            rand = Rnd()
+            If rand > 0.66 Then
+                enemyAry(i).Left += 5
+            ElseIf rand < 0.33 Then
+                enemyAry(i).Left -= 5
+            End If
+
+            If enemyAry(i).Left < 5 Then
+                enemyAry(i).Left += 10
+            End If
+            If enemyAry(i).Left > (Me.WIDTH - 40) Then
+                enemyAry(i).Left -= 10
+            End If
+        Next
+
+    End Sub
+
+    Private Sub scoreTimer_Tick(sender As Object, e As EventArgs) Handles scoreTimer.Tick
+        scre += 1
+        Score.Text = "Score: " & scre
+
+        If scre Mod 10 = 0 Then
+            enemySpd += 0.5
+        End If
+    End Sub
+
+
     Private Function Collision(ByVal object1 As Object, ByVal object2 As Object) As Boolean
         Dim collieded As Boolean = False
+
         If object1.Top + object1.Height >= object2.Top And
                 object2.Top + object2.Height >= object1.Top And
                 object1.left + object1.width >= object2.left And
@@ -118,11 +165,12 @@ Public Class Parachute
                 object2.visible = True Then
             collieded = True
         End If
+
         Return collieded
+
     End Function
 
     Private Sub createMissles(ByVal num As Integer)
-        Dim i As Integer = 0
 
         For i = 0 To num
 
@@ -140,13 +188,11 @@ Public Class Parachute
             missleAry(i).Visible = False
             missleOnScrn(i) = False
 
-
         Next
 
     End Sub
 
     Private Sub createEnemies(ByVal num As Integer)
-        Dim i As Integer = 0
 
         For i = 0 To num
             Dim enemy As New PictureBox
@@ -158,7 +204,7 @@ Public Class Parachute
             enemy.BorderStyle = BorderStyle.FixedSingle
             enemy.BackColor = Color.Red
             enemy.Top = 50
-            enemy.Left = i * 50
+            enemy.Left = i * 90
             enemy.BringToFront()
             enemyAry(i) = enemy
             enemyAry(i).Visible = True
@@ -180,6 +226,8 @@ Public Class Parachute
                 moveLeft = True
 
             Case Keys.Space
+                snd.SoundLocation = "laser.wav"
+                snd.Play()
 
                 For i = 0 To 9
                     If missleOnScrn(i) = True Then
@@ -197,8 +245,6 @@ Public Class Parachute
 
                     If missleNum = maxMissleNum Then missleNum = 0
 
-
-
                 End If
 
         End Select
@@ -213,17 +259,18 @@ Public Class Parachute
         End Select
     End Sub
 
+    Private Sub PlayBackgroundSoundFile()
+        Dim proc As New System.Diagnostics.Process()
+        proc = Process.Start("C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\bin\Debug\mortal.wav")
 
-    Public Sub StartGameLoop()
+    End Sub
 
+    Public Sub gameLoop()
         Do While isRunning = True
-
             Application.DoEvents()
-
             DrawGraphics()
 
         Loop
-
     End Sub
 
     Public Sub DrawGraphics()
@@ -285,6 +332,9 @@ Public Class Parachute
         Map(29, 28, 0) = 3
 
     End Sub
+
+
+
 
     'Sub New()
 
