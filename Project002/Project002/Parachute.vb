@@ -101,7 +101,7 @@ Public Class Parachute
                     enemyAry(j).Top = 0
                     enemyAry(j).Left = CInt(Rnd() * Me.WIDTH)
                     missleAry(i).Visible = False
-                    snd.SoundLocation = "oof.wav"
+                    snd.SoundLocation = "C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\oof.wav"
                     snd.Play()
                 End If
             Next
@@ -228,7 +228,7 @@ Public Class Parachute
                 moveLeft = True
 
             Case Keys.Space
-                snd.SoundLocation = "laser.wav"
+                snd.SoundLocation = "C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\laser.wav"
                 snd.Play()
 
                 For i = 0 To 9
@@ -263,7 +263,7 @@ Public Class Parachute
 
     Private Sub PlayBackgroundSoundFile()
         Dim proc As New System.Diagnostics.Process()
-        proc = Process.Start("C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\bin\Debug\mortal.wav")
+        proc = Process.Start("C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\mortal.wav")
 
     End Sub
 
