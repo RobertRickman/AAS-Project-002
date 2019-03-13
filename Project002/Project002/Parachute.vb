@@ -33,17 +33,18 @@ Public Class Parachute
     Dim missleNum As Integer = 0
     Dim missleOnScrn(10) As Boolean
 
-    Dim maxEnemyNum = 2
-    Public enemyAry(maxEnemyNum) As PictureBox
-    Public enemyOnScrn(maxEnemyNum) As Boolean
-    Dim enemySpd As Integer = 20
+    Dim maxEnemyNum = 1
+    Dim enemyAry(maxEnemyNum) As PictureBox
+
+    Dim enemyOnScrn(maxEnemyNum) As Boolean
+    Dim enemySpd As Integer = 5
 
     Dim scre As Integer
 
     Dim snd As New Media.SoundPlayer
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        'PlayBackgroundSoundFile()
+        PlayBackgroundSoundFile()
 
         Me.Show()
         Me.Focus()
@@ -53,7 +54,7 @@ Public Class Parachute
         GFX.Canon.Left = 250
         createMissles(maxMissleNum)
 
-        Enemies.createEnemies(maxEnemyNum)
+        createEnemies(maxEnemyNum)
 
         Randomize()
         'Starting Timers
@@ -104,9 +105,7 @@ Public Class Parachute
                     snd.Play()
                 End If
             Next
-
         Next
-
     End Sub
 
     Private Sub enemyTimer_Tick(sender As Object, e As EventArgs) Handles enemyTimer.Tick
@@ -121,8 +120,7 @@ Public Class Parachute
                 Timer.Stop()
                 enemyTimer.Stop()
                 scoreTimer.Stop()
-                MsgBox("Game Over BITCH!!")
-                Application.Exit()
+                MsgBox("Game Over")
             End If
 
             rand = Rnd()
@@ -147,7 +145,11 @@ Public Class Parachute
         Score.Text = "Score: " & scre
 
         If scre Mod 10 = 0 Then
-            enemySpd += 5
+            enemySpd += 2
+            maxEnemyNum += 1
+            ReDim enemyAry(maxEnemyNum)
+            ReDim enemyOnScrn(maxEnemyNum)
+            createEnemies(maxEnemyNum)
         End If
     End Sub
 
@@ -188,6 +190,26 @@ Public Class Parachute
 
         Next
 
+    End Sub
+
+    Private Sub createEnemies(ByVal num As Integer)
+        For i = 0 To num
+            Dim enemy As New PictureBox
+            enemy.Image = Image.FromFile("C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\Goblinp50.png")
+
+            Me.Controls.Add(enemy)
+            enemy.Width = 50
+            enemy.Height = 50
+            enemy.BorderStyle = BorderStyle.FixedSingle
+            enemy.BackColor = Color.Red
+            enemy.Top = 50
+            enemy.Left = i * 90
+            enemy.BringToFront()
+            enemyAry(i) = enemy
+            enemyAry(i).Visible = True
+            enemyOnScrn(i) = True
+
+        Next
     End Sub
 
     Private Sub Parachute_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
