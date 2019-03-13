@@ -23,24 +23,28 @@ Partial Class Parachute
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Me.DispatcherTimer = New System.Windows.Forms.Timer(Me.components)
+        Me.Timer = New System.Windows.Forms.Timer(Me.components)
         Me.SuspendLayout()
+        '
+        'Timer
+        '
+        Me.Timer.Interval = 20
         '
         'Parachute
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(584, 500)
+        Me.ClientSize = New System.Drawing.Size(499, 500)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.MaximizeBox = False
-        Me.MaximumSize = New System.Drawing.Size(600, 539)
+        Me.MaximumSize = New System.Drawing.Size(515, 539)
         Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(600, 539)
+        Me.MinimumSize = New System.Drawing.Size(515, 539)
         Me.Name = "Parachute"
         Me.Text = "Parachute"
         Me.ResumeLayout(False)
 
     End Sub
 
-    Friend WithEvents DispatcherTimer As Timer
+    Friend WithEvents Timer As Timer
 End Class

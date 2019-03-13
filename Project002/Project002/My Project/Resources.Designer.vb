@@ -63,6 +63,16 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property Canonp50() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Canonp50", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property EntitiesSpriteSheet() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("EntitiesSpriteSheet", resourceCulture)
@@ -73,9 +83,29 @@ Namespace My.Resources
         '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
+        Friend ReadOnly Property Goblinp50() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Goblinp50", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
         Friend ReadOnly Property MapSpriteSheet() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("MapSpriteSheet", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property RedLaserBeam() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("RedLaserBeam", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
