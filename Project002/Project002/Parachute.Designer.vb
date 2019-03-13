@@ -22,6 +22,8 @@ Partial Class Parachute
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
+        Me.DispatcherTimer = New System.Windows.Forms.Timer(Me.components)
         Me.SuspendLayout()
         '
         'Parachute
@@ -40,4 +42,5 @@ Partial Class Parachute
 
     End Sub
 
+    Friend WithEvents DispatcherTimer As Timer
 End Class

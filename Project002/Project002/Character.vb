@@ -4,7 +4,7 @@
     Dim spriteChar As Bitmap
     Dim spriteRect As Rectangle
     Dim spriteType As Integer
-    Dim moveSpd As Integer = 1
+    Dim moveSpd As Integer = 10
     Public moveDir As Short = 0
     Dim LastDir As Short = 2
 
@@ -37,6 +37,7 @@
         spriteChar.MakeTransparent(Color.White)
 
         Parachute.G.DrawImage(spriteChar, 5 * (Parachute.tileSize), 8 * (Parachute.tileSize - 4), spriteRect, GraphicsUnit.Pixel)
+
     End Sub
 
     'Key Detection
@@ -78,6 +79,7 @@
                 If isBlocked(0) = False Then
 
                     xPos += moveSpd
+
                     guyX = (guyX - moveSpd)
 
                     If xPos >= Parachute.tileSize Then
@@ -91,6 +93,7 @@
                 If isBlocked(1) = False Then
 
                     xPos -= moveSpd
+
                     guyX = (guyX + moveSpd)
 
                     If xPos <= Parachute.tileSize * -1 Then
