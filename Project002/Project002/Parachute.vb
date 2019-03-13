@@ -146,6 +146,9 @@ Public Class Parachute
 
         If scre Mod 10 = 0 Then
             enemySpd += 2
+            For i As Integer = 0 To maxEnemyNum
+                enemyAry(i).Visible = False
+            Next
             maxEnemyNum += 1
             ReDim enemyAry(maxEnemyNum)
             ReDim enemyOnScrn(maxEnemyNum)
