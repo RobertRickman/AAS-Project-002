@@ -33,15 +33,16 @@ Public Class Parachute
     Dim missleNum As Integer = 0
     Dim missleOnScrn(10) As Boolean
 
-    Dim maxEnemyNum = 1
-    Dim enemyAry(maxEnemyNum) As PictureBox
-
-    Dim enemyOnScrn(maxEnemyNum) As Boolean
-    Dim enemySpd As Integer = 5
+    Dim multiMissleMax As Integer = 1
+    Dim multiMAry(multiMissleMax) As PictureBox
+    Dim multiMNum As Integer = 0
+    Dim multiMOnScrn As Boolean
 
     Dim scre As Integer
 
     Dim snd As New Media.SoundPlayer
+
+    Private currentEnemies As Enemies
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         PlayBackgroundSoundFile()
@@ -53,8 +54,9 @@ Public Class Parachute
         GFX.Canon.Top = 380
         GFX.Canon.Left = 250
         createMissles(maxMissleNum)
+        createMultiMissle(multiMissleMax)
 
-        createEnemies(maxEnemyNum)
+        createEnemies(Enemies.maxEnemyNum)
 
         Randomize()
         'Starting Timers
@@ -96,12 +98,12 @@ Public Class Parachute
             End If
 
             'check for collision between enemies and missles
-            For j = 0 To maxEnemyNum
-                If Collision(missleAry(i), enemyAry(j)) Then
-                    enemyAry(j).Top = 0
-                    enemyAry(j).Left = CInt(Rnd() * Me.WIDTH)
+            For j = 0 To Enemies.maxEnemyNum
+                If Collision(missleAry(i), Enemies.enemyAry(j)) Then
+                    Enemies.enemyAry(j).Top = 0
+                    Enemies.enemyAry(j).Left = CInt(Rnd() * Me.WIDTH)
                     missleAry(i).Visible = False
-                    snd.SoundLocation = "C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\oof.wav"
+                    snd.SoundLocation = "C:\Users\gamep\Documents\cos\Spring 2019\AAS-Project-002\Project002\Project002\My Project\oof.wav"
                     snd.Play()
                 End If
             Next
@@ -109,35 +111,7 @@ Public Class Parachute
     End Sub
 
     Private Sub enemyTimer_Tick(sender As Object, e As EventArgs) Handles enemyTimer.Tick
-        Dim i As Integer
-        Dim rand As Double
-
-        For i = 0 To maxEnemyNum
-
-            enemyAry(i).Top += enemySpd
-
-            If enemyAry(i).Top > Me.HEIGHT Then
-                Timer.Stop()
-                enemyTimer.Stop()
-                scoreTimer.Stop()
-                MsgBox("Game Over")
-            End If
-
-            rand = Rnd()
-            If rand > 0.66 Then
-                enemyAry(i).Left += 5
-            ElseIf rand < 0.33 Then
-                enemyAry(i).Left -= 5
-            End If
-
-            If enemyAry(i).Left < 5 Then
-                enemyAry(i).Left += 10
-            End If
-            If enemyAry(i).Left > (Me.WIDTH - 40) Then
-                enemyAry(i).Left -= 10
-            End If
-        Next
-
+        Enemies.enemyMovement()
     End Sub
 
     Private Sub scoreTimer_Tick(sender As Object, e As EventArgs) Handles scoreTimer.Tick
@@ -145,14 +119,15 @@ Public Class Parachute
         Score.Text = "Score: " & scre
 
         If scre Mod 10 = 0 Then
-            enemySpd += 2
-            For i As Integer = 0 To maxEnemyNum
-                enemyAry(i).Visible = False
+            Enemies.enemySpd += 2
+            For i As Integer = 0 To Enemies.maxEnemyNum
+                Enemies.enemyAry(i).Visible = False
             Next
-            maxEnemyNum += 1
-            ReDim enemyAry(maxEnemyNum)
-            ReDim enemyOnScrn(maxEnemyNum)
-            createEnemies(maxEnemyNum)
+            Enemies.maxEnemyNum += 1
+            ReDim Enemies.enemyAry(Enemies.maxEnemyNum)
+            ReDim Enemies.enemyOnScrn(Enemies.maxEnemyNum)
+            createEnemies(Enemies.maxEnemyNum)
+            moveSpd += 2
         End If
     End Sub
 
@@ -178,7 +153,7 @@ Public Class Parachute
         For i = 0 To num
 
             Dim missle As New PictureBox
-            missle.Image = Image.FromFile("C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\RedLaserBeam.png")
+            missle.Image = Image.FromFile("C:\Users\gamep\Documents\COS\Spring 2019\AAS-Project-002\Project002\Project002\My Project\RedLaserBeam.png")
             Me.Controls.Add(missle)
             missle.Width = 9
             missle.Height = 19
@@ -195,10 +170,17 @@ Public Class Parachute
 
     End Sub
 
+    Private Sub createMultiMissle(ByVal num As Integer)
+        For i = 0 To num
+            Dim multMissle As New PictureBox
+            multiMissleMax.Image = Image.FromFile
+        Next
+    End Sub
+
     Private Sub createEnemies(ByVal num As Integer)
         For i = 0 To num
             Dim enemy As New PictureBox
-            enemy.Image = Image.FromFile("C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\Goblinp50.png")
+            enemy.Image = Image.FromFile("C:\Users\gamep\Documents\COS\Spring 2019\AAS-Project-002\Project002\Project002\My Project\Goblinp50.png")
 
             Me.Controls.Add(enemy)
             enemy.Width = 50
@@ -208,9 +190,9 @@ Public Class Parachute
             enemy.Top = 50
             enemy.Left = i * 90
             enemy.BringToFront()
-            enemyAry(i) = enemy
-            enemyAry(i).Visible = True
-            enemyOnScrn(i) = True
+            Enemies.enemyAry(i) = enemy
+            Enemies.enemyAry(i).Visible = True
+            Enemies.enemyOnScrn(i) = True
 
         Next
     End Sub
@@ -228,7 +210,7 @@ Public Class Parachute
                 moveLeft = True
 
             Case Keys.Space
-                snd.SoundLocation = "C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\laser.wav"
+                snd.SoundLocation = "C:\Users\gamep\Documents\cos\Spring 2019\AAS-Project-002\Project002\Project002\My Project\laser.wav"
                 snd.Play()
 
                 For i = 0 To 9
@@ -263,7 +245,7 @@ Public Class Parachute
 
     Private Sub PlayBackgroundSoundFile()
         Dim proc As New System.Diagnostics.Process()
-        proc = Process.Start("C:\Users\gamep\Documents\COS\Spring 2019\AAS Project 002\Project002\Project002\My Project\mortal.wav")
+        proc = Process.Start("C:\Users\gamep\Documents\COS\Spring 2019\AAS-Project-002\Project002\Project002\My Project\mortal.wav")
 
     End Sub
 
