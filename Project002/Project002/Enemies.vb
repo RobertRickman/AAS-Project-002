@@ -1,59 +1,146 @@
 ﻿Public Class Enemies
-    Private health As Integer
-    Public Shared maxEnemyNum = 1
-    Public Shared enemyAry(maxEnemyNum) As PictureBox
-    Public Shared enemyOnScrn(maxEnemyNum) As Boolean
-    Public Shared enemySpd As Integer = 5
 
-    Public Sub New()
-        health = 100
-    End Sub
+    Private enemy As PictureBox
+    Private spritesrc As Image
+    Private bstyle As BorderStyle
+    Private bcolor As Color
+    Private w As Integer
+    Private h As Integer
+    Private y As Integer
+    Private x As Integer
 
-    Public Property hp() As Integer
+    Public Property enem As PictureBox
         Get
-            Return health
+            Return enemy
         End Get
-        Set(value As Integer)
-            health = value
+        Set(value As PictureBox)
+            enemy = value
         End Set
     End Property
 
-    Public Sub New(ByVal hp As Integer)
-        health = hp
-    End Sub
+    Public Property sprite As Image
+        Get
+            Return spritesrc
+        End Get
+        Set(value As Image)
+            spritesrc = value
+        End Set
+    End Property
 
-    Public Sub Attack(ByRef baseHealth As Integer)
-        baseHealth -= 10
-    End Sub
+    Public Property bstl As BorderStyle
+        Get
+            Return bstyle
+        End Get
+        Set(value As BorderStyle)
+            bstyle = value
+        End Set
+    End Property
 
-    Public Shared Sub enemyMovement()
-        Dim i As Integer
-        Dim rand As Double
+    Public Property brdcol As Color
+        Get
+            Return bcolor
+        End Get
+        Set(value As Color)
+            bcolor = value
+        End Set
+    End Property
 
-        For i = 0 To maxEnemyNum
+    Public Property width As Integer
+        Get
+            Return w
+        End Get
+        Set(value As Integer)
+            w = value
+        End Set
+    End Property
 
-            enemyAry(i).Top += enemySpd
+    Public Property height As Integer
+        Get
+            Return h
+        End Get
+        Set(value As Integer)
+            h = value
+        End Set
+    End Property
 
-            If enemyAry(i).Top > Parachute.HEIGHT Then
-                Parachute.Timer.Stop()
-                Parachute.enemyTimer.Stop()
-                Parachute.scoreTimer.Stop()
-                MsgBox("Game Over")
-            End If
+    Public Property yPos As Integer
+        Get
+            Return y
+        End Get
+        Set(value As Integer)
+            y = value
+        End Set
+    End Property
 
-            rand = Rnd()
-            If rand > 0.66 Then
-                enemyAry(i).Left += 5
-            ElseIf rand < 0.33 Then
-                enemyAry(i).Left -= 5
-            End If
+    Public Property xPos As Integer
+        Get
+            Return x
+        End Get
+        Set(value As Integer)
+            x = value
+        End Set
+    End Property
 
-            If enemyAry(i).Left < 5 Then
-                enemyAry(i).Left += 10
-            End If
-            If enemyAry(i).Left > (Parachute.WIDTH - 40) Then
-                enemyAry(i).Left -= 10
-            End If
-        Next
+    Public Function createEnemies() As PictureBox
+        enem.Image = sprite
+
+        enem.Width = width
+        enem.Height = height
+        enem.BorderStyle = bstl
+        enem.BackColor = brdcol
+        enem.Top = y
+        enem.Left = x
+        enem.BringToFront()
+        enem.Visible = True
+
+        Return enem
+
+    End Function
+
+    Public Shared maxEnemyNum = 0
+    Public Shared enemySpd As Double = 1
+
+    Public Sub enemyMovement()
+
+        Try
+
+            Dim i As Integer
+            Dim rand As Double
+
+            For i = 0 To maxEnemyNum
+
+                enem.Top += enemySpd
+
+                If enem.Top > Parachute.HEIGHT Then
+                    Parachute.Timer.Stop()
+                    Parachute.enemyTimer.Stop()
+                    Parachute.scoreTimer.Stop()
+                    MsgBox("Game Over")
+                    Parachute.Visible = False
+                    Parachute.Close()
+                End If
+
+                rand = Rnd()
+
+                If rand > 0.66 Then
+                    enem.Left += 5
+                ElseIf rand < 0.33 Then
+                    enem.Left -= 5
+                End If
+
+                If enem.Left < 5 Then
+                    enem.Left += 10
+                End If
+
+                If enem.Left > (Parachute.WIDTH - 40) Then
+                    enem.Left -= 10
+                End If
+
+            Next
+
+        Catch ex As Exception
+            MsgBox(ex.Message)
+        End Try
+
     End Sub
 End Class

@@ -1,4 +1,5 @@
 ﻿Imports System.Drawing
+Imports System.Media
 
 Public Class Parachute
 
@@ -36,289 +37,427 @@ Public Class Parachute
     Dim multiMissleMax As Integer = 1
     Dim multiMAry(multiMissleMax) As PictureBox
     Dim multiMNum As Integer = 0
-    Dim multiMOnScrn As Boolean
+    Dim multiMOnScrn(multiMissleMax) As Boolean
+
+    Dim entities(Enemies.maxEnemyNum) As Enemies
+    Dim enemyOnScrn(Enemies.maxEnemyNum) As Boolean
+    Dim enemyL As New ArrayList()
 
     Dim scre As Integer
+    Dim enscre As Integer
 
-    Dim snd As New Media.SoundPlayer
-
-    Private currentEnemies As Enemies
+    Dim baseHealth As Integer = 100
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        PlayBackgroundSoundFile()
 
-        Me.Show()
-        Me.Focus()
+        Try
 
-        Me.Controls.Add(GFX.Canon)
-        GFX.Canon.Top = 380
-        GFX.Canon.Left = 250
-        createMissles(maxMissleNum)
-        createMultiMissle(multiMissleMax)
+            'PlayBackgroundSoundFile()
 
-        createEnemies(Enemies.maxEnemyNum)
+            Me.Show()
+            Me.Focus()
 
-        Randomize()
-        'Starting Timers
-        Timer.Start()
-        enemyTimer.Start()
-        scoreTimer.Start()
+            'add character to screen plus position
+            Me.Controls.Add(GFX.Canon)
+            GFX.Canon.Top = 380
+            GFX.Canon.Left = 250
 
-        'Initialize graphic objects before setting values
-        G = Me.CreateGraphics
-        BckBuf = New Bitmap(WIDTH, HEIGHT)
-        bmpTile = New Bitmap(GFX.pbGFX.Image)
+            'creating missles and enemies
+            createMissles(maxMissleNum)
+            'createMultiMissle(multiMissleMax)          
 
-        LoadMap()
-        'Continue to draw background graphics
-        gameLoop()
+            Randomize()
+
+            'Starting Timers
+            Timer.Start()
+            enemyTimer.Start()
+            scoreTimer.Start()
+
+            For i As Integer = 0 To Enemies.maxEnemyNum
+                entities(i) = New Enemies
+
+                entities(i).enem = New PictureBox
+
+                entities(i).sprite = My.Resources.Goblinp50
+                entities(i).width = 50
+                entities(i).height = 50
+                entities(i).bstl = BorderStyle.FixedSingle
+                entities(i).brdcol = Color.Red
+                entities(i).yPos = 0
+                entities(i).xPos = i * 90
+                entities(i).enem.BringToFront()
+                enemyOnScrn(i) = True
+                enemyL.Add(entities(i))
+                Me.Controls.Add(enemyL.Item(i).createEnemies())
+            Next
+
+            'Initialize graphic objects before setting values
+            G = Me.CreateGraphics
+            BckBuf = New Bitmap(WIDTH, HEIGHT)
+            bmpTile = New Bitmap(GFX.pbGFX.Image)
+
+            If Me.Visible = True Then
+                'load certain images
+                LoadMap()
+
+                'Continue to draw background graphics as objects move
+                gameLoop()
+            End If
+
+        Catch ex As Exception
+            MsgBox("FormLoad" & ex.Message)
+        End Try
 
     End Sub
 
     'character and missle movement
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
-        Dim i As Integer
-        Dim j As Integer
 
-        If moveRight = True And (GFX.Canon.Left < Me.WIDTH - 40) Then
-            GFX.Canon.Left += moveSpd
-        End If
-        If moveLeft = True And (GFX.Canon.Left > -10) Then
-            GFX.Canon.Left -= moveSpd
-        End If
+        Try
 
-        For i = 0 To maxMissleNum
-            If missleOnScrn(i) = True Then
-                missleAry(i).Top -= 10
+            Dim i As Integer
+            Dim j As Integer
+
+            'moving right if not going past right boundry and moveright is true
+            If moveRight = True And (GFX.Canon.Left < Me.WIDTH - 40) Then
+                GFX.Canon.Left += moveSpd
             End If
 
-            If missleAry(i).Top <= -19 Then
-                missleOnScrn(i) = False
-
+            'moving left if not going past left boundry and moveleft is true
+            If moveLeft = True And (GFX.Canon.Left > -10) Then
+                GFX.Canon.Left -= moveSpd
             End If
 
-            'check for collision between enemies and missles
-            For j = 0 To Enemies.maxEnemyNum
-                If Collision(missleAry(i), Enemies.enemyAry(j)) Then
-                    Enemies.enemyAry(j).Top = 0
-                    Enemies.enemyAry(j).Left = CInt(Rnd() * Me.WIDTH)
-                    missleAry(i).Visible = False
-                    snd.SoundLocation = "C:\Users\gamep\Documents\cos\Spring 2019\AAS-Project-002\Project002\Project002\My Project\oof.wav"
-                    snd.Play()
+            For i = 0 To maxMissleNum
+
+                'if missle is spawned/onscreen then move it up
+                If missleOnScrn(i) = True Then
+                    missleAry(i).Top -= 10
                 End If
+                'if missle has gone out of bounds make it invisible
+                If missleAry(i).Top <= -19 Then
+                    missleOnScrn(i) = False
+                End If
+
+
+                For j = 0 To Enemies.maxEnemyNum
+
+                    'if the missle an enemy objects are in the same area on the form then reset enemy location to the top
+                    'and to the right or left randomly and then make missle invisible, play oof sound
+                    If Collision(missleAry(i), entities(j).enem) Then
+                        entities(j).enem.Top = 0
+                        entities(j).enem.Left = CInt(Rnd() * Me.WIDTH)
+                        missleAry(i).Visible = False
+                        My.Computer.Audio.Play(My.Resources.oof, AudioPlayMode.Background)
+                    End If
+
+                Next
+
             Next
-        Next
+
+        Catch ex As Exception
+            MsgBox("TimerTick" & ex.Message)
+        End Try
+
     End Sub
 
     Private Sub enemyTimer_Tick(sender As Object, e As EventArgs) Handles enemyTimer.Tick
-        Enemies.enemyMovement()
+
+        enscre += 1
+        For i As Integer = 0 To Enemies.maxEnemyNum
+            entities(i).enemyMovement()
+        Next
+
     End Sub
 
     Private Sub scoreTimer_Tick(sender As Object, e As EventArgs) Handles scoreTimer.Tick
-        scre += 1
-        Score.Text = "Score: " & scre
 
-        If scre Mod 10 = 0 Then
-            Enemies.enemySpd += 2
-            For i As Integer = 0 To Enemies.maxEnemyNum
-                Enemies.enemyAry(i).Visible = False
-            Next
-            Enemies.maxEnemyNum += 1
-            ReDim Enemies.enemyAry(Enemies.maxEnemyNum)
-            ReDim Enemies.enemyOnScrn(Enemies.maxEnemyNum)
-            createEnemies(Enemies.maxEnemyNum)
-            moveSpd += 2
-        End If
+        Try
+
+            scre += 1
+            Score.Text = "Score: " & scre
+
+            If scre Mod 10 = 0 Then
+
+                Enemies.enemySpd += 0.5
+
+                For i As Integer = 0 To Enemies.maxEnemyNum
+                    enemyL.Item(i).enem.Visible = False
+                Next
+
+                Enemies.maxEnemyNum += 1
+
+                ReDim entities(Enemies.maxEnemyNum)
+
+                ReDim enemyOnScrn(Enemies.maxEnemyNum)
+
+                enemyL.Clear()
+
+                For x As Integer = 0 To Enemies.maxEnemyNum
+
+                    entities(x) = New Enemies
+                    entities(x).enem = New PictureBox
+
+                    entities(x).sprite = My.Resources.Goblinp50
+                    entities(x).width = 50
+                    entities(x).height = 50
+                    entities(x).bstl = BorderStyle.FixedSingle
+                    entities(x).brdcol = Color.Red
+                    entities(x).yPos = 0
+                    entities(x).xPos = x * 90
+                    entities(x).enem.BringToFront()
+                    enemyOnScrn(x) = True
+                    enemyL.Add(entities(x))
+                    Me.Controls.Add(enemyL.Item(x).createEnemies())
+
+                Next
+                moveSpd += 2
+            End If
+
+        Catch ex As Exception
+            MsgBox("scoreTimer" & ex.Message)
+        End Try
+
     End Sub
 
 
     Private Function Collision(ByVal object1 As Object, ByVal object2 As Object) As Boolean
-        Dim collieded As Boolean = False
 
-        If object1.Top + object1.Height >= object2.Top And
-                object2.Top + object2.Height >= object1.Top And
-                object1.left + object1.width >= object2.left And
-                object2.left + object2.width >= object1.left And
-                object1.visible = True And
-                object2.visible = True Then
-            collieded = True
-        End If
+        Try
 
-        Return collieded
+            Dim collieded As Boolean = False
+
+            If object1.Top + object1.Height >= object2.Top And
+                    object2.Top + object2.Height >= object1.Top And
+                    object1.left + object1.width >= object2.left And
+                    object2.left + object2.width >= object1.left And
+                    object1.visible = True And
+                    object2.visible = True Then
+                collieded = True
+            End If
+
+            Return collieded
+
+        Catch ex As Exception
+            MsgBox("colieded" & ex.Message)
+        End Try
 
     End Function
 
     Private Sub createMissles(ByVal num As Integer)
 
-        For i = 0 To num
+        Try
 
-            Dim missle As New PictureBox
-            missle.Image = Image.FromFile("C:\Users\gamep\Documents\COS\Spring 2019\AAS-Project-002\Project002\Project002\My Project\RedLaserBeam.png")
-            Me.Controls.Add(missle)
-            missle.Width = 9
-            missle.Height = 19
-            missle.BorderStyle = BorderStyle.FixedSingle
-            missle.BackColor = Color.Blue
-            missle.Top = GFX.Canon.Top + GFX.Canon.Height / 2 - GFX.missle.Height / 2
-            missle.Left = GFX.Canon.Left + GFX.Canon.Width / 2 - GFX.missle.Width / 2
-            missle.BringToFront()
-            missleAry(i) = missle
-            missleAry(i).Visible = False
-            missleOnScrn(i) = False
+            For i = 0 To num
 
-        Next
+                Dim missle As New PictureBox
+                missle.Image = My.Resources.RedLaserBeam
+                Me.Controls.Add(missle)
+                missle.Width = 9
+                missle.Height = 19
+                missle.BorderStyle = BorderStyle.FixedSingle
+                missle.BackColor = Color.Blue
+                missle.Top = GFX.Canon.Top + GFX.Canon.Height / 2 - GFX.missle.Height / 2
+                missle.Left = GFX.Canon.Left + GFX.Canon.Width / 2 - GFX.missle.Width / 2
+                missle.BringToFront()
+                missleAry(i) = missle
+                missleAry(i).Visible = False
+                missleOnScrn(i) = False
+
+            Next
+
+        Catch ex As Exception
+            MsgBox("CreateMissles" & ex.Message)
+        End Try
 
     End Sub
 
-    Private Sub createMultiMissle(ByVal num As Integer)
-        For i = 0 To num
-            Dim multMissle As New PictureBox
-            multiMissleMax.Image = Image.FromFile
-        Next
-    End Sub
+    'Private Sub createMultiMissle(ByVal num As Integer)
+    '    Try
 
-    Private Sub createEnemies(ByVal num As Integer)
-        For i = 0 To num
-            Dim enemy As New PictureBox
-            enemy.Image = Image.FromFile("C:\Users\gamep\Documents\COS\Spring 2019\AAS-Project-002\Project002\Project002\My Project\Goblinp50.png")
+    '        For i = 0 To num
+    '            Dim multMissle As New PictureBox
+    '            multMissle.Image = My.Resources.RedLaserBeam
 
-            Me.Controls.Add(enemy)
-            enemy.Width = 50
-            enemy.Height = 50
-            enemy.BorderStyle = BorderStyle.FixedSingle
-            enemy.BackColor = Color.Red
-            enemy.Top = 50
-            enemy.Left = i * 90
-            enemy.BringToFront()
-            Enemies.enemyAry(i) = enemy
-            Enemies.enemyAry(i).Visible = True
-            Enemies.enemyOnScrn(i) = True
-
-        Next
-    End Sub
+    '            Me.Controls.Add(multMissle)
+    '            multMissle.Width = 9
+    '            multMissle.Height = 19
+    '            multMissle.BorderStyle = BorderStyle.FixedSingle
+    '            multMissle.BackColor = Color.Blue
+    '            multMissle.Top = GFX.Canon.Top + GFX.Canon.Height / 2 - GFX.missle.Height / 2
+    '            multMissle.Left = i * 90
+    '            multMissle.BringToFront()
+    '            multiMAry(i) = multMissle
+    '            multiMAry(i).Visible = False
+    '            multiMOnScrn(i) = False
+    '        Next
+    '    Catch ex As Exception
+    '        MsgBox("MultiMissles" & ex.Message)
+    '    End Try
+    'End Sub
 
     Private Sub Parachute_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        Dim i As Integer = 0
-        Dim count As Integer = 1
 
-        Select Case e.KeyValue
+        Try
 
-            Case Keys.Right
-                moveRight = True
+            Dim i As Integer = 0
+            Dim count As Integer = 1
 
-            Case Keys.Left
-                moveLeft = True
+            Select Case e.KeyValue
 
-            Case Keys.Space
-                snd.SoundLocation = "C:\Users\gamep\Documents\cos\Spring 2019\AAS-Project-002\Project002\Project002\My Project\laser.wav"
-                snd.Play()
+                Case Keys.Right
+                    moveRight = True
 
-                For i = 0 To 9
-                    If missleOnScrn(i) = True Then
-                        count += 1
+                Case Keys.Left
+                    moveLeft = True
+
+                Case Keys.Space
+                    My.Computer.Audio.Play(My.Resources.laser, AudioPlayMode.Background)
+
+                    For i = 0 To 9
+                        If missleOnScrn(i) = True Then
+                            count += 1
+                        End If
+                    Next
+
+                    If count <= 9 Then
+                        missleOnScrn(missleNum) = True
+                        missleAry(missleNum).Visible = True
+
+                        missleAry(missleNum).Top = GFX.Canon.Top + GFX.Canon.Height / 2 - missleAry(missleNum).Height / 2
+                        missleAry(missleNum).Left = GFX.Canon.Left + GFX.Canon.Width / 2 - missleAry(missleNum).Width / 2
+                        missleNum += 1
+
+                        If missleNum = maxMissleNum Then missleNum = 0
+
                     End If
-                Next
 
-                If count <= 9 Then
-                    missleOnScrn(missleNum) = True
-                    missleAry(missleNum).Visible = True
+            End Select
 
-                    missleAry(missleNum).Top = GFX.Canon.Top + GFX.Canon.Height / 2 - missleAry(missleNum).Height / 2
-                    missleAry(missleNum).Left = GFX.Canon.Left + GFX.Canon.Width / 2 - missleAry(missleNum).Width / 2
-                    missleNum += 1
+        Catch ex As Exception
+            MsgBox("keydown" & ex.Message)
+        End Try
 
-                    If missleNum = maxMissleNum Then missleNum = 0
-
-                End If
-
-        End Select
     End Sub
 
     Private Sub Parachute_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        Select Case e.KeyValue
-            Case Keys.Right
-                moveRight = False
-            Case Keys.Left
-                moveLeft = False
-        End Select
-    End Sub
 
-    Private Sub PlayBackgroundSoundFile()
-        Dim proc As New System.Diagnostics.Process()
-        proc = Process.Start("C:\Users\gamep\Documents\COS\Spring 2019\AAS-Project-002\Project002\Project002\My Project\mortal.wav")
+        Try
+
+            Select Case e.KeyValue
+                Case Keys.Right
+                    moveRight = False
+                Case Keys.Left
+                    moveLeft = False
+            End Select
+
+        Catch ex As Exception
+            MsgBox("keyUp" & ex.Message)
+        End Try
 
     End Sub
 
     Public Sub gameLoop()
-        Do While isRunning = True
-            Application.DoEvents()
-            DrawGraphics()
 
-        Loop
+        Try
+
+            If Me.Visible = False Then
+                isRunning = False
+                Environment.Exit(Environment.ExitCode)
+            End If
+
+            Do While isRunning = True
+                Application.DoEvents()
+                DrawGraphics()
+            Loop
+
+        Catch ex As Exception
+            MsgBox("gameLoop" & ex.Message)
+        End Try
+
     End Sub
 
     Public Sub DrawGraphics()
 
-        For x As Integer = -1 To 9
-            For y As Integer = -1 To 9
-
-                getSrcRect(MapX + x, MapY + y, tileSize, tileSize)
-
-                drec = New Rectangle((x * tileSize), (y * tileSize), tileSize, tileSize)
-
-                G.DrawImage(bmpTile, drec, srec, GraphicsUnit.Pixel)
-
-            Next
-        Next
-
-        G = Graphics.FromImage(BckBuf)
-
         Try
+
+            If Me.Visible = False Then
+                Environment.Exit(Environment.ExitCode)
+            End If
+
+            For x As Integer = -1 To 9
+                For y As Integer = -1 To 9
+
+                    getSrcRect(MapX + x, MapY + y, tileSize, tileSize)
+
+                    drec = New Rectangle((x * tileSize), (y * tileSize), tileSize, tileSize)
+
+                    G.DrawImage(bmpTile, drec, srec, GraphicsUnit.Pixel)
+
+                Next
+            Next
+
+            G = Graphics.FromImage(BckBuf)
+
             BckGrdG = Me.CreateGraphics()
+
+            BckGrdG.DrawImage(BckBuf, 0, 0, WIDTH, HEIGHT)
+
+            G.Clear(Color.Wheat)
+
         Catch ex As Exception
-           
+            MsgBox("DrawG" & ex.Message)
         End Try
-
-        BckGrdG.DrawImage(BckBuf, 0, 0, WIDTH, HEIGHT)
-
-        G.Clear(Color.Wheat)
 
     End Sub
 
     'getting image source for map tiles
     Public Sub getSrcRect(ByVal x As Integer, ByVal y As Integer, ByVal w As Integer, ByVal h As Integer)
 
-        Select Case Map(x, y, 0)
-            Case 0 'grass
-                srec = New Rectangle(0, 0, tileSize, tileSize)
-            Case 1 'wall
-                srec = New Rectangle(50, 50, tileSize, tileSize)
-            Case 2 'left edge
-                srec = New Rectangle(50, 0, tileSize, tileSize)
-                Map(x, y, 1) = 1
-            Case 3 'right edge
-                srec = New Rectangle(0, 50, tileSize, tileSize)
-                Map(x, y, 1) = 1
-            Case 4 'middle
-                srec = New Rectangle(100, 0, tileSize, tileSize)
-        End Select
+        Try
+
+            Select Case Map(x, y, 0)
+                Case 0 'grass
+                    srec = New Rectangle(0, 0, tileSize, tileSize)
+                Case 1 'wall
+                    srec = New Rectangle(50, 50, tileSize, tileSize)
+                Case 2 'left edge
+                    srec = New Rectangle(50, 0, tileSize, tileSize)
+                    Map(x, y, 1) = 1
+                Case 3 'right edge
+                    srec = New Rectangle(0, 50, tileSize, tileSize)
+                    Map(x, y, 1) = 1
+                Case 4 'middle
+                    srec = New Rectangle(100, 0, tileSize, tileSize)
+            End Select
+
+        Catch ex As Exception
+            MsgBox("getSrc" & ex.Message)
+        End Try
 
     End Sub
 
     'Loading Map
     Private Sub LoadMap()
-        'Wall
-        For x As Integer = 20 To 29
-            Map(x, 29, 0) = 1
-        Next
-        'Middle
-        For x As Integer = 21 To 28
-            Map(x, 28, 0) = 4
-        Next
-        'Left edge
-        Map(20, 28, 0) = 2
-        'Right edge
-        Map(29, 28, 0) = 3
+
+        Try
+
+            'Wall
+            For x As Integer = 20 To 29
+                Map(x, 29, 0) = 1
+            Next
+            'Middle
+            For x As Integer = 21 To 28
+                Map(x, 28, 0) = 4
+            Next
+            'Left edge
+            Map(20, 28, 0) = 2
+            'Right edge
+            Map(29, 28, 0) = 3
+
+        Catch ex As Exception
+            MsgBox("LoadMap" & ex.Message)
+        End Try
 
     End Sub
 
